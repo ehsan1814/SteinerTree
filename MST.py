@@ -105,7 +105,7 @@ class Graph:
         parent = [] 
         rank = [] 
 
-        for node in range(self.V):
+        for node in range(self.V + 1):
             parent.append(node)
             rank.append(0)
         
@@ -131,9 +131,10 @@ if __name__ == "__main__":
     number_of_nodes, edges , number_of_terminals, terminals = a.read_file()
     graph = Graph(number_of_nodes)
     graph.graph = edges
+    i = 1
     for a in graph.make_MST() :
-        print(a)
-    
+        print(i , a , sep="--")
+        i =  i +  1
     
     
     
