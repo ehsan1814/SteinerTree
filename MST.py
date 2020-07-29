@@ -4,10 +4,12 @@ class ReadWriteFile:
         self.write_dir = write_dir
     
     def read_file(self):
+        number_of_nodes = 0
+        number_of_terminals = 0
         edges = []
         terminals = []
         
-        file = open(self.read_dir, "w")
+        file = open(self.read_dir, "r")
         for line in file:
             splited_line = line.split() 
             i = 0
@@ -16,9 +18,9 @@ class ReadWriteFile:
                     number_of_nodes = int(splited_line[i + 1])
 
                 if splited_line[i] == "E":
-                    u = splited_line[i + 1]
-                    v = splited_line[i + 2]
-                    wieght = splited_line[i + 3]
+                    u = int(splited_line[i + 1])
+                    v = int(splited_line[i + 2])
+                    wieght = int(splited_line[i + 3])
                     edges.append(Edge(u, v, wieght))
 
                 if splited_line[i] == "Terminals":
@@ -30,11 +32,12 @@ class ReadWriteFile:
                     break
                 
                 if splited_line[i] == "T":
-                    terminals.append(splited_line[i+1])
-
+                    terminals.append(int(splited_line[i + 1]))
+                
                 i = i + 1
+
         file.close()
-        return number_of_nodes, number_of_terminals, edges, terminals
+        return number_of_nodes, edges , number_of_terminals, terminals
 
 
 
@@ -122,20 +125,15 @@ class Graph:
         return result
                 
 
-
-
 #This part is for test
 if __name__ == "__main__":
-    '''graph = Graph(4)
-    graph.graph = [Edge(0,1,0), Edge(0,2,1), Edge(0,3,5), Edge(1,3,1)]
-    res = graph.make_MST()
-    for a in res:
-        print(a)'''
-
     a = ReadWriteFile("cc6-2p.stp")
-    print(a.read_dir)
-    a.read_file()
-    #print(w,x,y,z,sep="\n")
+    number_of_nodes, edges , number_of_terminals, terminals = a.read_file()
+    graph = Graph(number_of_nodes)
+    graph.graph = edges
+    for a in graph.make_MST() :
+        print(a)
+    
     
     
     
