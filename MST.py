@@ -1,8 +1,11 @@
 class ReadWriteFile:
     def __init__(self, read_dir, write_dir=None):
         self.read_dir = read_dir
-        self.write_dir = write_dir
-    
+        if write_dir == None:
+            self.write_dir = self.read_dir[0:-3] + ".out"
+        else:
+            self.write_dir = write_dir
+
     def read_file(self):
         number_of_nodes = 0
         number_of_terminals = 0
@@ -40,10 +43,10 @@ class ReadWriteFile:
         return number_of_nodes, edges , number_of_terminals, terminals
 
 
-
     def write_file(self):
-        pass
-
+        file = open(self.write_dir)
+        file.close()
+        
 
 class Edge:
     def __init__(self, u, v, wieght):
@@ -61,13 +64,29 @@ class Edge:
 class Graph:
     def __init__(self, vertices):
         self.V = vertices   #Number of vertices
-        self.graph = []     #List for store graph
+        self.graph = []     #List for store graph or store edges in a list (Edges)
+        self.MST = []       #List for store Minimum Spannig Tree
+        self.terminals = [] #List for save nodes that is terminal
     
+    #Setter method for terminals
+    def set_terminals(self, list_of_terminals):
+        self.terminals = list_of_terminals
+
+    #Getter method for terminals
+    def get_terminals(self):
+        return self.terminals
+
+    #Setter method for graph
+    def set_graph(self, list_of_edges):
+        self.graph = list_of_edges
     
+    #Getter method for graph
+    def get_graph(self):
+        return self.graph
+
     #This function for add Edge
     def add_edge_to_graph(self, u, v, wieght):
         self.graph.append(Edge(u, v, wieght))
-
 
     #This function for find parent of verticle
     #Use path compression way 
@@ -91,19 +110,19 @@ class Graph:
             parent[yParent] = xParent
             rank[xParent] += 1
         
-    
+    #This function make minimum spannig tree
     def make_MST(self):
         
         result = [] #This is for save MST 
 
-        i = 0
-        e = 0
+        i = 0 #This is index for sorted edges to make a MST
+        e = 0 #This is for edges that check the rule for tree
 
         #This is for sort edges based on weight
         self.graph = sorted(self.graph, key=lambda attribute: attribute[2])
 
-        parent = [] 
-        rank = [] 
+        parent = [] #This is show parent of each node
+        rank = []   
 
         for node in range(self.V + 1):
             parent.append(node)
@@ -122,8 +141,11 @@ class Graph:
                 result.append(Edge(u,v,wieght))
                 self.union(parent, rank, x, y)
 
-        return result
-                
+        self.MST = result
+
+    def make_steiner_tree(self):
+        pass           
+
 
 #This part is for test
 if __name__ == "__main__":
@@ -132,9 +154,12 @@ if __name__ == "__main__":
     graph = Graph(number_of_nodes)
     graph.graph = edges
     i = 1
-    for a in graph.make_MST() :
-        print(i , a , sep="--")
-        i =  i +  1
+    graph.make_MST()
+    graph.terminals = [1,2]
+    print(graph.terminals)
+    # for a in graph.MST :
+    #     print(i , a , sep="--")
+    #     i =  i +  1
     
     
     
