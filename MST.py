@@ -62,11 +62,18 @@ class Edge:
 
 
 class Graph:
-    def __init__(self, vertices):
-        self.V = vertices   #Number of vertices
-        self.graph = []     #List for store graph or store edges in a list (Edges)
+    def __init__(self, num_of_nodes):
+        self.V = num_of_nodes   #Number of Nodes
+        self.graph = []     #List store edges in a list 
         self.MST = []       #List for store Minimum Spannig Tree
-        self.terminals = [] #List for save nodes that is terminal
+        self.terminals = [] #List for save name of nodes that is terminal
+        
+        '''
+        List for save all nodes of a graph and thier wieght in MST 
+        (This is helper to save nodes for make a steiner tree)
+        '''
+        self.nodes = [Node(-1,float("inf"))]   
+        
     
     #Setter method for terminals
     def set_terminals(self, list_of_terminals):
@@ -88,8 +95,8 @@ class Graph:
     def add_edge_to_graph(self, u, v, wieght):
         self.graph.append(Edge(u, v, wieght))
 
-    #This function for find parent of verticle
-    #Use path compression way 
+    '''This function for find parent of verticle
+        Use path compression way '''
     def find_parent(self, parent, i):
         if parent[i] == i :
             return i 
@@ -113,7 +120,7 @@ class Graph:
     #This function make minimum spannig tree
     def make_MST(self):
         
-        result = [] #This is for save MST 
+        result = [] #This is for save MST(Save all edges in MST)
 
         i = 0 #This is index for sorted edges to make a MST
         e = 0 #This is for edges that check the rule for tree
@@ -144,21 +151,64 @@ class Graph:
         self.MST = result
 
     def make_steiner_tree(self):
-        pass           
 
+        ''' In this part we make array and add 
+            each node to this array.'''
+        for i in range(1, self.V + 1):
+            self.nodes.append(Node(i))
+        
+        for j in self.MST:
+            self.nodes[j.u].add_relation_node(j.v)
+            self.nodes[j.v].add_relation_node(j.u)
+            self.nodes[j.u].add_wieght_of_node()
+            self.nodes[j.v].add_wieght_of_node()
 
+        # i = 1  #this part for test
+        # for a in self.nodes :
+        #     print("In the func" ,i , a.wieght_of_node , sep = " - ")
+        #     i = i + 1
+
+        self.nodes = sorted(self.nodes, key=lambda attribute: attribute[1])
+
+        
+                   
+class Node:
+    def __init__(self, name, wieght_of_node=0):
+        self.name = name                     #This is name of the node     
+        self.wieght_of_node = wieght_of_node #This is the wieght of the node
+        self.relation_nodes = []             #This is the nodes that we have an edge to them
+
+    def __getitem__(self,wieght_of_node):
+        return self.wieght_of_node
+
+    def add_relation_node(self, name_of_node):
+        self.relation_nodes.append(name_of_node)
+    
+    def add_wieght_of_node(self):
+        self.wieght_of_node = self.wieght_of_node + 1
+
+    def sub_wieght_of_node(self):
+        self.wieght_of_node = self.wieght_of_node - 1
+    
+    
 #This part is for test
 if __name__ == "__main__":
+    
     a = ReadWriteFile("cc6-2p.stp")
     number_of_nodes, edges , number_of_terminals, terminals = a.read_file()
     graph = Graph(number_of_nodes)
-    graph.graph = edges
+    graph.set_graph(edges)
     i = 1
     graph.make_MST()
-    graph.terminals = [1,2]
-    print(graph.terminals)
+    graph.make_steiner_tree()
+    for a in graph.nodes :
+        print(i , a.wieght_of_node , sep = " - ")
+        i = i + 1
+    # graph.set_terminals(terminals)
+    # print(graph.terminals)
+    # i = 1
     # for a in graph.MST :
-    #     print(i , a , sep="--")
+    #     print(i , a , sep=" -- ")
     #     i =  i +  1
     
     
