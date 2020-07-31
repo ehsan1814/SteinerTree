@@ -69,13 +69,7 @@ class Graph:
         self.graph = []     #List for store edges 
         self.MST = []       #List for store Minimum Spannig Tree
         self.terminals = [] #List for save name of nodes that is terminal
-        
-        '''
-        List for save all nodes of a graph and thier wieght in MST 
-        (This is helper to save nodes for make a steiner tree)
-        '''
-        self.nodes = [Node(-1,float("inf"))]
-        self.steiner = []
+        self.steiner = []   #List for store steiner tree
         
     
     #Setter method for terminals
@@ -154,45 +148,51 @@ class Graph:
         self.MST = result
 
     def make_steiner_tree(self):
+        
+        '''
+        List for save all nodes of a graph and thier wieght in MST 
+        (This is helper to save nodes for make a steiner tree)
+        '''
+        nodes = [Node(-1,float("inf"))]
 
         ''' In this part we make array and add 
             each node to this array.'''
         for i in range(1, self.V + 1):
-            self.nodes.append(Node(i))
+            nodes.append(Node(i))
 
         for i in self.terminals:
-            self.nodes[i].is_terminal = True
+            nodes[i].is_terminal = True
 
         ''' In this part we traverse MST edges, 
             evaluate wieght of nodes
             and add each node to another node. 
         ''' 
         for j in self.MST:
-            self.nodes[j.u].add_relation_node(j.v)
-            self.nodes[j.v].add_relation_node(j.u)
+            nodes[j.u].add_relation_node(j.v)
+            nodes[j.v].add_relation_node(j.u)
         
 
 
         # i = 1  #this part for test
-        # for a in self.nodes :
+        # for a in nodes :
         #     print("In the func" ,i , a.wieght_of_node , sep = " - ")
         #     i = i + 1
 
-        temp = self.nodes
-        self.nodes = sorted(self.nodes, key=lambda attribute: attribute[1])#shayad inam nakhad
-        # heapify(self.nodes)
+        temp = nodes
+        nodes = sorted(nodes, key=lambda attribute: attribute[1])#shayad inam nakhad
+        # heapify(nodes)
 
-        # for i in range(1, len(self.nodes) + 1):
-        #     if self.nodes[i].
-        # heapify(self.nodes)
-        # while self.nodes[0].wieght_of_node == 1 :
-        #     for i in range(1, len(self.nodes) + 1):
+        # for i in range(1, len(nodes) + 1):
+        #     if nodes[i].
+        # heapify(nodes)
+        # while nodes[0].wieght_of_node == 1 :
+        #     for i in range(1, len(nodes) + 1):
         #         pass
 
         for i in range(len(temp)):
-            self.nodes = temp
-            heapify(self.nodes)
-            element = heappop(self.nodes)
+            nodes = temp
+            heapify(nodes)
+            element = heappop(nodes)
             
             while element.wieght_of_node == 1 :
                 if not element.is_terminal:
@@ -203,9 +203,10 @@ class Graph:
                     temp[element.name].delete_relation_node(rel_node)
                     temp[element.name].wieght_of_node = float("inf")
 
-                element = heappop(self.nodes)
+                element = heappop(nodes)
 
         # for i in temp:
+        self.steiner = temp
 
                 
                     
