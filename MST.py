@@ -160,7 +160,7 @@ class Graph:
         for i in range(1, self.V + 1):
             nodes.append(Node(i))
 
-        print("test func this is terminal :" ,self.terminals,sep="--")
+        
         for i in self.terminals:
             nodes[i].is_terminal = True
 
@@ -180,14 +180,14 @@ class Graph:
         #     i = i + 1
 
         temp = []
-        temp1 = []
+        # temp1 = []
         for a in nodes:
             temp.append(a)
-            temp1.append(a)
+            # temp1.append(a)
         nodes = sorted(nodes, key=lambda attribute: attribute[1])#shayad inam nakhad
-        print("This is test , temp ",temp,sep="--")
-        print("This is test , temp1 ",temp1,sep="--")
-        print("This is test , temp ",nodes,sep="--")
+        # print("This is test , temp ",temp,sep="--")
+        # print("This is test , temp1 ",temp1,sep="--")
+        # print("This is test , temp ",nodes,sep="--")
         # heapify(nodes)
 
         # for i in range(1, len(nodes) + 1):
@@ -197,21 +197,33 @@ class Graph:
         #     for i in range(1, len(nodes) + 1):
         #         pass
 
-        for i in range(len(temp) - 1):
-            nodes = temp1#moshkel in ja hast
-            heapify(nodes)
-            element = heappop(nodes)
+        # for i in range(len(temp) - 1):
+        #     nodes = temp#moshkel in ja hast
+        #     heapify(nodes)
+        #     element = heappop(nodes)
             
-            while element.wieght_of_node == 1 :
-                if not element.is_terminal:
-                    for a in element.relation_nodes:
-                        rel_node = a
+        #     while element.wieght_of_node == 1 :
+        #         if not element.is_terminal:
+        #             for a in element.relation_nodes:
+        #                 rel_node = a
                     
-                    temp[rel_node].delete_relation_node(element.name)
-                    temp[element.name].delete_relation_node(rel_node)
-                    temp[element.name].wieght_of_node = float("inf")
+        #             temp[rel_node].delete_relation_node(element.name)
+        #             temp[element.name].delete_relation_node(rel_node)
+        #             temp[element.name].wieght_of_node = float("inf")
 
-                element = heappop(nodes)
+        #         element = heappop(nodes)
+        
+        for i in range(len(nodes) - 1):
+            nodes = sorted(temp, key=lambda attribute: attribute[1])
+            for j in nodes:
+                if j.wieght_of_node == 1:
+                    if not j.is_terminal:
+                        for a in j.relation_nodes:
+                            rel_node = a
+                        temp[rel_node].delete_relation_node(j.name)
+                        temp[j.name].delete_relation_node(rel_node)
+                        temp[j.name].wieght_of_node = float("inf")
+
 
         # for i in temp:
         self.steiner = temp
@@ -245,7 +257,7 @@ class Node:
         self.wieght_of_node = self.wieght_of_node - 1
     
     def __str__(self):
-        return "{} - {} - {}".format(self.name, self.wieght_of_node, self.relation_nodes)
+        return "name : {} -- rel : {}".format(self.name, self.relation_nodes)
     
     
 #This part is for test
@@ -292,5 +304,4 @@ if __name__ == "__main__":
     test.make_steiner_tree()
     i = 1
     for a in test.steiner:
-        print(i,a,sep=" - ")
-        i = i + 1
+        print(a,sep=" - ")
