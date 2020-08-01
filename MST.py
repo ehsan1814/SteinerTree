@@ -160,6 +160,7 @@ class Graph:
         for i in range(1, self.V + 1):
             nodes.append(Node(i))
 
+        print("test func this is terminal :" ,self.terminals,sep="--")
         for i in self.terminals:
             nodes[i].is_terminal = True
 
@@ -178,8 +179,15 @@ class Graph:
         #     print("In the func" ,i , a.wieght_of_node , sep = " - ")
         #     i = i + 1
 
-        temp = nodes
+        temp = []
+        temp1 = []
+        for a in nodes:
+            temp.append(a)
+            temp1.append(a)
         nodes = sorted(nodes, key=lambda attribute: attribute[1])#shayad inam nakhad
+        print("This is test , temp ",temp,sep="--")
+        print("This is test , temp1 ",temp1,sep="--")
+        print("This is test , temp ",nodes,sep="--")
         # heapify(nodes)
 
         # for i in range(1, len(nodes) + 1):
@@ -189,8 +197,8 @@ class Graph:
         #     for i in range(1, len(nodes) + 1):
         #         pass
 
-        for i in range(len(temp)):
-            nodes = temp
+        for i in range(len(temp) - 1):
+            nodes = temp1#moshkel in ja hast
             heapify(nodes)
             element = heappop(nodes)
             
@@ -207,11 +215,8 @@ class Graph:
 
         # for i in temp:
         self.steiner = temp
-
-                
-                    
-        
-                   
+   
+                          
 class Node:
     def __init__(self, name, wieght_of_node=0):
         self.name = name                     #This is name of the node     
@@ -221,6 +226,9 @@ class Node:
 
     def __getitem__(self,wieght_of_node):
         return self.wieght_of_node
+    
+    def __lt__(self, other):
+        return self.wieght_of_node < other.wieght_of_node
 
     def add_relation_node(self, name_of_node):
         self.relation_nodes[name_of_node] = name_of_node
@@ -236,27 +244,53 @@ class Node:
     def sub_wieght_of_node(self):
         self.wieght_of_node = self.wieght_of_node - 1
     
+    def __str__(self):
+        return "{} - {} - {}".format(self.name, self.wieght_of_node, self.relation_nodes)
+    
     
 #This part is for test
-if __name__ == "__main__":
+# if __name__ == "__main__":
     
-    a = ReadWriteFile("cc6-2p.stp")
-    number_of_nodes, edges , number_of_terminals, terminals = a.read_file()
-    graph = Graph(number_of_nodes)
-    graph.set_graph(edges)
-    i = 1
-    graph.make_MST()
-    # graph.make_steiner_tree()
-    # for a in graph.nodes :
-    #     print(i , a.name ,a.wieght_of_node , sep = " - ")
-    #     i = i + 1
+#     a = ReadWriteFile("cc6-2p.stp")
+#     number_of_nodes, edges , number_of_terminals, terminals = a.read_file()
+#     graph = Graph(number_of_nodes)
+#     graph.set_graph(edges)
+#     i = 1
+#     graph.make_MST()
     # graph.set_terminals(terminals)
-    # print(graph.terminals)
-    # i = 1
-    # heapify(graph.MST)
-    for a in graph.MST :
-        print( a , sep=" -- ")
-        i =  i +  1
+#     # graph.make_steiner_tree()
+#     # for a in graph.nodes :
+#     #     print(i , a.name ,a.wieght_of_node , sep = " - ")
+#     #     i = i + 1
+#     # graph.set_terminals(terminals)
+#     # print(graph.terminals)
+#     # i = 1
+#     # heapify(graph.MST)
+#     for a in graph.MST :
+#         print( a , sep=" -- ")
+#         i =  i +  1
     
-    
-    
+if __name__ == "__main__":
+    #info
+    number_of_nodes = 5
+    edges = [Edge(1,2,5),Edge(1,3,5),Edge(1,5,1),Edge(2,5,2),Edge(5,4,1),Edge(4,3,0),Edge(3,2,6)]
+    number_of_terminals = 3
+    terminals = [3,4,5]    
+    #Test part
+    test = Graph(number_of_nodes)
+    test.set_graph(edges)
+    test.set_terminals(terminals)
+
+    #This part make MST and show
+    test.make_MST()
+    i = 1
+    # for a in test.MST:
+    #     print(i,a,sep=" - ")
+    #     i = i + 1
+    # print(Node(19))
+    #This part make Steiner and show
+    test.make_steiner_tree()
+    i = 1
+    for a in test.steiner:
+        print(i,a,sep=" - ")
+        i = i + 1
