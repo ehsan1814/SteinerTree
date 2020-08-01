@@ -1,6 +1,3 @@
-from heapq import heapify, heappush, heappop
-from PUC import *
-
 class ReadWriteFile:
     def __init__(self, read_dir, write_dir=None):
         self.read_dir = read_dir
@@ -8,6 +5,8 @@ class ReadWriteFile:
             self.write_dir = self.read_dir[0:-4] + ".out"
         else:
             self.write_dir = write_dir
+        
+        self.write_file()
 
     def read_file(self):
         number_of_nodes = 0
