@@ -1,4 +1,5 @@
 from heapq import heapify, heappush, heappop
+all_of_the_edges = {}
 
 class ReadWriteFile:
     def __init__(self, read_dir, write_dir=None):
@@ -26,7 +27,8 @@ class ReadWriteFile:
                     u = int(splited_line[i + 1])
                     v = int(splited_line[i + 2])
                     wieght = int(splited_line[i + 3])
-                    edges.append(Edge(u, v, wieght))
+                    all_of_the_edges[(min(u, v),max(u,v))]= wieght
+                    edges.append(Edge(min(u, v),max(u,v), wieght))
 
                 if splited_line[i] == "Terminals":
                     try:
@@ -46,7 +48,8 @@ class ReadWriteFile:
 
 
     def write_file(self):
-        file = open(self.write_dir)
+        file = open(self.write_dir,"w")
+
         file.close()
         
 
@@ -70,6 +73,7 @@ class Graph:
         self.MST = []       #List for store Minimum Spannig Tree
         self.terminals = [] #List for save name of nodes that is terminal
         self.steiner = []   #List for store steiner tree
+        self.cost_of_steiner_tree = 0
         
     
     #Setter method for terminals
@@ -159,7 +163,6 @@ class Graph:
             each node to this array.'''
         for i in range(1, self.V + 1):
             nodes.append(Node(i))
-
         
         for i in self.terminals:
             nodes[i].is_terminal = True
@@ -171,47 +174,11 @@ class Graph:
         for j in self.MST:
             nodes[j.u].add_relation_node(j.v)
             nodes[j.v].add_relation_node(j.u)
-        
-
-
-        # i = 1  #this part for test
-        # for a in nodes :
-        #     print("In the func" ,i , a.wieght_of_node , sep = " - ")
-        #     i = i + 1
+    
 
         temp = []
-        # temp1 = []
         for a in nodes:
-            temp.append(a)
-            # temp1.append(a)
-        nodes = sorted(nodes, key=lambda attribute: attribute[1])#shayad inam nakhad
-        # print("This is test , temp ",temp,sep="--")
-        # print("This is test , temp1 ",temp1,sep="--")
-        # print("This is test , temp ",nodes,sep="--")
-        # heapify(nodes)
-
-        # for i in range(1, len(nodes) + 1):
-        #     if nodes[i].
-        # heapify(nodes)
-        # while nodes[0].wieght_of_node == 1 :
-        #     for i in range(1, len(nodes) + 1):
-        #         pass
-
-        # for i in range(len(temp) - 1):
-        #     nodes = temp#moshkel in ja hast
-        #     heapify(nodes)
-        #     element = heappop(nodes)
-            
-        #     while element.wieght_of_node == 1 :
-        #         if not element.is_terminal:
-        #             for a in element.relation_nodes:
-        #                 rel_node = a
-                    
-        #             temp[rel_node].delete_relation_node(element.name)
-        #             temp[element.name].delete_relation_node(rel_node)
-        #             temp[element.name].wieght_of_node = float("inf")
-
-        #         element = heappop(nodes)
+            temp.append(a)               
         
         for i in range(len(nodes) - 1):
             nodes = sorted(temp, key=lambda attribute: attribute[1])
@@ -225,9 +192,27 @@ class Graph:
                         temp[j.name].wieght_of_node = float("inf")
 
 
-        # for i in temp:
         self.steiner = temp
-   
+        self.make_steiner_tree_from_temp()
+    
+    def make_steiner_tree_from_temp(self):
+        ls = []
+        for i in self.steiner:
+            for j in i.relation_nodes:
+                minimum = min(i.name,j) 
+                maximum = max(i.name,j)
+                tuple = (minimum,maximum)
+                if  tuple not in ls:
+                    ls.append(Edge(minimum,maximum,all_of_the_edges[(minimum,maximum)]))
+        self.steiner = ls
+
+    def cost_of_steiner_tree(self):
+        counter = 0
+        for a in self.steiner:
+            counter += a.wieght
+        
+        self.cost_of_steiner_tree = counter
+
                           
 class Node:
     def __init__(self, name, wieght_of_node=0):
@@ -257,51 +242,50 @@ class Node:
         self.wieght_of_node = self.wieght_of_node - 1
     
     def __str__(self):
-        return "name : {} -- rel : {}".format(self.name, self.relation_nodes)
+        return "name : {}-- wieght : {} -- rel : {}".format(self.name, self.wieght_of_node, self.relation_nodes)
     
     
 #This part is for test
-# if __name__ == "__main__":
-    
-#     a = ReadWriteFile("cc6-2p.stp")
-#     number_of_nodes, edges , number_of_terminals, terminals = a.read_file()
-#     graph = Graph(number_of_nodes)
-#     graph.set_graph(edges)
-#     i = 1
-#     graph.make_MST()
-    # graph.set_terminals(terminals)
-#     # graph.make_steiner_tree()
-#     # for a in graph.nodes :
-#     #     print(i , a.name ,a.wieght_of_node , sep = " - ")
-#     #     i = i + 1
-#     # graph.set_terminals(terminals)
-#     # print(graph.terminals)
-#     # i = 1
-#     # heapify(graph.MST)
-#     for a in graph.MST :
-#         print( a , sep=" -- ")
-#         i =  i +  1
-    
 if __name__ == "__main__":
-    #info
-    number_of_nodes = 5
-    edges = [Edge(1,2,5),Edge(1,3,5),Edge(1,5,1),Edge(2,5,2),Edge(5,4,1),Edge(4,3,0),Edge(3,2,6)]
-    number_of_terminals = 3
-    terminals = [3,4,5]    
-    #Test part
-    test = Graph(number_of_nodes)
-    test.set_graph(edges)
-    test.set_terminals(terminals)
-
-    #This part make MST and show
-    test.make_MST()
+    
+    a = ReadWriteFile("cc6-2p.stp")
+    number_of_nodes, edges , number_of_terminals, terminals = a.read_file()
+    graph = Graph(number_of_nodes)
+    graph.set_graph(edges)
+    graph.set_terminals(terminals)
     i = 1
-    # for a in test.MST:
-    #     print(i,a,sep=" - ")
+    graph.make_MST()
+    graph.make_steiner_tree()
+    
+    # graph.make_steiner_tree()
+    # for a in graph.nodes :
+    #     print(i , a.name ,a.wieght_of_node , sep = " - ")
     #     i = i + 1
-    # print(Node(19))
-    #This part make Steiner and show
-    test.make_steiner_tree()
-    i = 1
-    for a in test.steiner:
-        print(a,sep=" - ")
+    # print(graph.terminals)
+    # i = 1
+    # heapify(graph.MST)
+    # graph.steiner = sorted(graph.steiner,key=lambda a: a[2])
+    for a in graph.steiner :
+        print( a , sep=" -- ")
+        i =  i +  1
+    
+# if __name__ == "__main__":
+#     #info
+#     number_of_nodes = 5
+#     edges = [Edge(1,2,5),Edge(1,3,5),Edge(1,5,1),Edge(2,5,2),Edge(5,4,1),Edge(4,3,0),Edge(3,2,6)]
+#     number_of_terminals = 3
+#     terminals = [3,4,5]    
+#     #Test part
+#     test = Graph(number_of_nodes)
+#     test.set_graph(edges)
+#     test.set_terminals(terminals)
+
+#     #This part make MST and show
+#     test.make_MST()
+#     i = 1
+#   
+#     #This part make Steiner and show
+#     test.make_steiner_tree()
+#     i = 1
+#     for a in test.steiner:
+#         print(a,sep=" - ")
