@@ -48,8 +48,14 @@ class ReadWriteFile:
 
 
     def write_file(self):
-        file = open(self.write_dir,"w")
+        number_of_nodes, edges , number_of_terminals, terminals = self.read_file()
+        g1 = Graph(number_of_nodes)
+        g1.set_graph(edges)
+        g1.set_terminals(terminals)
+        g1.make_MST()
+        g1.make_steiner_tree()
 
+        file = open(self.write_dir,"w")
         file.close()
         
 
@@ -194,6 +200,7 @@ class Graph:
 
         self.steiner = temp
         self.make_steiner_tree_from_temp()
+        self.cost_of_steiner_tree()
     
     def make_steiner_tree_from_temp(self):
         ls = []
