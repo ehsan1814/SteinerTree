@@ -1,3 +1,5 @@
+import os
+
 class ReadWriteFile:
     def __init__(self, read_dir, write_dir=None):
         self.read_dir = read_dir
@@ -10,7 +12,6 @@ class ReadWriteFile:
 
     def read_file(self):
         number_of_nodes = 0
-        number_of_terminals = 0
         edges = []
         terminals = []
         
@@ -28,13 +29,6 @@ class ReadWriteFile:
                     wieght = int(splited_line[i + 3])
                     edges.append(Edge(min(u, v),max(u,v), wieght))
 
-                if splited_line[i] == "Terminals":
-                    try:
-                        number_of_terminals = int(splited_line[i + 1])    
-                    except IndexError :
-                        break
-                    
-                    break
                 
                 if splited_line[i] == "T":
                     terminals.append(int(splited_line[i + 1]))
@@ -42,11 +36,11 @@ class ReadWriteFile:
                 i = i + 1
 
         file.close()
-        return number_of_nodes, edges , number_of_terminals, terminals
+        return number_of_nodes, edges , terminals
 
 
     def write_file(self):
-        number_of_nodes, edges , number_of_terminals, terminals = self.read_file()
+        number_of_nodes, edges , terminals = self.read_file()
         g1 = Graph(number_of_nodes)
         g1.set_graph(edges)
         g1.set_terminals(terminals)
@@ -54,11 +48,12 @@ class ReadWriteFile:
         g1.make_steiner_tree()
 
         file = open(self.write_dir,"w")
-        file.write("Cost {}\n".format(g1.cost_of_steiner_tree))
+        file.write("Cost of MST {}\n".format(g1.cost_of_mst))
+        file.write("Cost of Steiner Tree {}\n".format(g1.cost_of_steiner_tree))
         file.write("Edges {}\n".format(len(g1.steiner)))
         
         for i in g1.steiner:
-            file.write("E {} {}\n".format(i.u,i.v,i.wieght))
+            file.write("E {} {} {}\n".format(i.u,i.v,i.wieght))
         
         file.close()
         
@@ -89,6 +84,7 @@ class Graph:
         self.terminals = [] #List for save name of nodes that is terminal
         self.steiner = []   #List for store steiner tree
         self.cost_of_steiner_tree = 0
+        self.cost_of_mst = 0
         
     
     #Setter method for terminals
@@ -165,6 +161,7 @@ class Graph:
                 self.union(parent, rank, x, y)
 
         self.MST = result
+        self.cost_of_mst_function()
 
     def make_steiner_tree(self):
         
@@ -229,7 +226,13 @@ class Graph:
             counter += a.wieght
         
         self.cost_of_steiner_tree = counter
-
+    
+    def cost_of_mst_function(self):
+        counter = 0
+        for a in self.MST:
+            counter += a.wieght
+        
+        self.cost_of_mst = counter
                           
 class Node:
     def __init__(self, name, wieght_of_node=0):
@@ -264,4 +267,8 @@ class Node:
     
 #This part is for test
 if __name__ == "__main__":
-    file = ReadWriteFile()
+    for root, dirs, files in os.walk(".", topdown=False):
+        for i in files:
+            if i[-3:] == "stp":
+                file = ReadWriteFile(i)
+    
